@@ -1,0 +1,18 @@
+auth:
+  rootPassword: password123
+  username: admin
+  password: adminpass
+  database: myappdb
+
+persistence:
+  enabled: true
+  size: 1Gi
+  storageClass: local-path
+
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 100m
+  limits:
+    memory: 512Mi
+    cpu: 200m
