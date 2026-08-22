@@ -1,0 +1,36 @@
+namespace: microservices-helm
+
+mongodb:
+  image: mongo:6.0
+  replicas: 1
+  username: admin
+  password: securepassword123
+  storage: 1Gi
+  storageClass: local-path
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 200m
+
+api:
+  image: nginx:1.25
+  replicas: 2
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 50m
+
+frontend:
+  image: nginx:1.25
+  replicas: 2
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 50m
+
+ingress:
+  frontendHost: frontend-helm.local
+  apiHost: api-helm.local

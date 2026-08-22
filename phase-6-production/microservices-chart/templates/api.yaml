@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-service
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.api.replicas }}
+  selector:
+    matchLabels:
+      app: api-service
+  template:
+    metadata:
+      labels:
+        app: api-service
+    spec:
+      initContainers:
+      - name: init
+        image: busybox
+        command:
+        - sh
+        - -c
+        - echo "<h1>API Service</h1><p>Deployed with Helm</p>" > /html/index.html
+        volumeMounts:
+        - name: api-html
+          mountPath: /html
+      containers:
+      - name: api
+        image: {{ .Values.api.image }}
+        ports:
+        - containerPort: 80
+        env:
+        - name: MONGO_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: MONGO_HOST
+        - name: MONGO_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: MONGO_USERNAME
+        volumeMounts:
+        - name: api-html
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: api-html
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: api-service
+  ports:
+  - port: 3000
+    targetPort: 80

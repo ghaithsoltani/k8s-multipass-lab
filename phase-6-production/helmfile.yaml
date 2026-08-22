@@ -1,0 +1,23 @@
+repositories:
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+
+releases:
+  - name: microservices-app
+    chart: ./microservices-chart
+    namespace: microservices-helm
+    values:
+      - microservices-chart/values.yaml
+
+  - name: monitoring-mongo
+    chart: bitnami/mongodb
+    namespace: monitoring
+    createNamespace: true
+    values:
+      - name: monitoring-mongo
+        auth:
+          rootPassword: monitoringpass
+        persistence:
+          enabled: true
+          size: 512Mi
+          storageClass: local-path

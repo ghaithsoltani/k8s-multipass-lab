@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: microservices
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      initContainers:
+      - name: init
+        image: busybox
+        command:
+        - sh
+        - -c
+        - echo "<h1>Frontend</h1><p>Microservices app on Kubernetes</p>" > /html/index.html
+        volumeMounts:
+        - name: frontend-html
+          mountPath: /html
+      containers:
+      - name: frontend
+        image: nginx:1.25
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: frontend-html
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: frontend-html
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: microservices
+spec:
+  selector:
+    app: frontend
+  ports:
+  - port: 80
+    targetPort: 80
